@@ -92,7 +92,8 @@ Router.post('/login', (req, res) => {
 			return user.generateToken()
 		})
 		.then( token => {
-			res.setHeader('x-auth', token).send({})
+			res.setHeader('x-auth', token)
+			res.send({'x-auth' : token})
 		})
 		.catch(err => {
 			res.send(err)

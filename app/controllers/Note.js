@@ -61,8 +61,19 @@ const Router = express.Router()
 // module.exports = Router
 
 
-module.exports.list = function(req, res){
+module.exports.view_all_notes = function(req, res){
 	Note.find()
+		.then((notes) => {
+			res.send(notes)
+		})
+		.catch((err) => {
+			res.send(err)
+		})
+}
+
+module.exports.list = function(req, res){
+	const user = req.user
+	Note.find({user: user._id})
 		.then((notes) => {
 			res.send(notes)
 		})
@@ -85,7 +96,8 @@ module.exports.create = function(req, res){
 
 module.exports.show = function(req, res){
 	const id = req.params.id;
-	Note.findById(id).populate('category').populate('tags.tag', ['name'])
+	const user = req.user
+	Note.findOne({user: user._id, _id: id}).populate('category').populate('tags.tag', ['name'])
 		.then((doc) => {
 			res.json(doc)
 		})
@@ -106,9 +118,22 @@ module.exports.update = function(req, res){
 		})
 }
 
+module.exports.remove = (req, res) => {
+	const noteId = req.query.noteId;
+	const tagId = req.query.tagId;
+	Note.findByIdAndUpdate({_id: noteId}, {$pull: {tags: {_id: tagId}}}, {new: true}).populate('category').populate('tags.tag', ['name'])
+		.then((doc) => {
+			res.json({notice: "Tag removed successfully.", document: doc})
+		})
+		.catch((err) => {
+			res.json(err)
+		})
+}
+
 module.exports.destroy = function(req, res) {
 	const id = req.params.id;
-	Note.findByIdAndRemove(id)
+	const user = req.user
+	Note.findOneAndRemove({user: user._id, _id: id})
 		.then((doc) => {
 			res.json({notice: "Record deleted successfully."})
 		})

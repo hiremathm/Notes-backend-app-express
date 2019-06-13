@@ -21,7 +21,12 @@ const NoteSchema = new Schema({
 		ref: 'Category',
 		required: true
 	},
-	tags: [{tag: {type: Schema.Types.ObjectId, ref: 'Tag', required: true}}]
+	tags: [{tag: {type: Schema.Types.ObjectId, ref: 'Tag', required: true}}],
+	user: {
+		type: Schema.Types.ObjectId,
+		ref: 'User',
+		required: true
+	}
 })
 
 //Lifef Cycle Methods
